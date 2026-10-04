@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="SpectroPark Dynamics — Rueda de Chicago con motor eléctrico y BioWheel, rueda inteligente con sensor RGB para analizar el color de las hojas.">
+  <title>SpectroPark Dynamics | Grupo 8</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+:root{
+  --bg:#0F0C1B;--bg2:#151024;--violet:#6A1B9A;--yellow:#FFEA00;--pink:#C2185B;
+  --white:#FFF;--muted:#B9B5C6;--line:rgba(255,255,255,.1);--glass:rgba(255,255,255,.055);
+  --shadow:0 20px 70px rgba(0,0,0,.4);--radius:22px;--max:1200px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:Inter,Arial,sans-serif;background:var(--bg);color:var(--white);line-height:1.6;overflow-x:hidden}
+body:before{content:"";position:fixed;inset:0;pointer-events:none;background-image:linear-gradient(rgba(255,255,255,.018) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.018) 1px,transparent 1px);background-size:45px 45px;mask-image:linear-gradient(to bottom,black,transparent 80%);z-index:-2}
+a{text-decoration:none;color:inherit}
+button,input,textarea,select{font:inherit}
+.ambient{position:fixed;border-radius:50%;filter:blur(100px);opacity:.18;pointer-events:none;z-index:-1}
+.ambient-a{width:420px;height:420px;background:var(--violet);top:-120px;left:-160px}
+.ambient-b{width:380px;height:380px;background:var(--pink);right:-160px;top:45%}
+.navbar{position:fixed;top:0;left:0;right:0;height:76px;display:flex;align-items:center;justify-content:space-between;padding:0 max(20px,calc((100% - var(--max))/2));background:rgba(15,12,27,.78);backdrop-filter:blur(18px);border-bottom:1px solid var(--line);z-index:100}
+.brand{display:flex;align-items:center;gap:10px;font-weight:800;letter-spacing:.08em;font-size:14px;white-space:nowrap}
+.brand>span:last-child>span{color:var(--yellow)}
+.brand small{display:block;font-size:7px;color:var(--muted);letter-spacing:.25em}
+.brand-mark{width:28px;height:28px;border:1px solid var(--yellow);border-radius:50%;display:flex;align-items:center;justify-content:center;gap:2px;box-shadow:0 0 15px rgba(255,234,0,.3)}
+.brand-mark span{width:3px;height:13px;background:var(--yellow);display:block}
+.brand-mark span:nth-child(2){height:18px;background:var(--pink)}
+.brand-mark span:nth-child(3){height:9px;background:#9c4dcc}
+nav{display:flex;gap:5px}
+nav a{font-size:12px;color:var(--muted);padding:10px 12px;border-radius:10px;transition:.25s}
+nav a:hover{color:var(--white);background:rgba(255,255,255,.06)}
+.menu-toggle{display:none;background:none;border:0;color:white;font-size:25px}
+.section{width:min(var(--max),calc(100% - 40px));margin:auto;padding:115px 0 55px}
+.hero{min-height:800px;padding-top:145px;display:grid;grid-template-columns:1fr 1fr;align-items:center;gap:55px}
+.eyebrow,.card-kicker,.section-heading>div>span{font-family:"JetBrains Mono",monospace;font-size:10px;letter-spacing:.18em;color:var(--yellow)}
+.eyebrow span{display:inline-block;width:8px;height:8px;border-radius:50%;background:#48ff8b;box-shadow:0 0 12px #48ff8b;margin-right:7px}
+h1{font-size:clamp(46px,6vw,82px);line-height:.98;letter-spacing:-.06em;margin:20px 0}
+h1 em{font-style:normal;color:var(--yellow);text-shadow:0 0 25px rgba(255,234,0,.18)}
+.hero-subtitle{font-size:20px;font-weight:700;color:#e8d8ef}
+.hero-text{color:var(--muted);max-width:590px;margin:15px 0 28px}
+.hero-actions{display:flex;gap:12px;flex-wrap:wrap}
+.btn{border:1px solid transparent;border-radius:12px;padding:13px 18px;font-weight:800;font-size:12px;display:inline-flex;align-items:center;justify-content:center;gap:10px;cursor:pointer;transition:.25s}
+.btn-primary{background:var(--yellow);color:#17120a;box-shadow:0 0 25px rgba(255,234,0,.18)}
+.btn-primary:hover{transform:translateY(-3px);box-shadow:0 0 35px rgba(255,234,0,.42)}
+.btn-ghost{border-color:rgba(255,255,255,.17);color:white;background:rgba(255,255,255,.04)}
+.btn-ghost:hover{border-color:var(--pink);box-shadow:0 0 24px rgba(194,24,91,.3)}
+.full{width:100%}
+.hero-stats{display:flex;gap:34px;margin-top:42px}
+.hero-stats div{display:grid;gap:2px}.hero-stats strong{font-family:"JetBrains Mono";color:#fff}.hero-stats span{font-size:10px;color:var(--muted)}
+.hero-visual{height:570px;position:relative;display:grid;place-items:center}
+.orbit{position:absolute;border:1px solid rgba(255,234,0,.18);border-radius:50%;animation:spin 18s linear infinite}
+.orbit-1{width:450px;height:450px}.orbit-2{width:530px;height:530px;border-color:rgba(194,24,91,.12);animation-direction:reverse;animation-duration:25s}
+.wheel-stage{width:400px;height:400px;display:grid;place-items:center;filter:drop-shadow(0 0 30px rgba(106,27,154,.35))}
+.wheel{width:340px;height:340px;border:8px solid #71309b;border-radius:50%;position:relative;transition:transform 1s cubic-bezier(.2,.8,.2,1);box-shadow:0 0 35px rgba(106,27,154,.35),inset 0 0 30px rgba(106,27,154,.2)}
+.wheel:before{content:"";position:absolute;inset:25px;border:1px dashed rgba(255,234,0,.3);border-radius:50%}
+.wheel:after{content:"";position:absolute;width:80%;height:2px;background:linear-gradient(90deg,transparent,var(--yellow),transparent);left:10%;top:50%;box-shadow:0 0 15px var(--yellow)}
+.wheel-hub{position:absolute;width:72px;height:72px;left:calc(50% - 36px);top:calc(50% - 36px);border-radius:50%;background:var(--bg);border:3px solid var(--yellow);display:grid;place-items:center;font-family:"JetBrains Mono";font-size:12px;z-index:4;box-shadow:0 0 25px rgba(255,234,0,.25)}
+.cabin{--radius-c:132px;position:absolute;left:calc(50% - 20px);top:calc(50% - 20px);width:40px;height:40px;border-radius:9px;display:grid;place-items:center;font-weight:900;font-family:"JetBrains Mono";transform:rotate(calc(var(--i)*45deg)) translateY(calc(-1 * var(--radius-c))) rotate(calc(var(--i)*-45deg));z-index:5;border:2px solid rgba(255,255,255,.5)}
+.cabin-red{background:#d72545}.cabin-green{background:#18a968}.cabin-blue{background:#2667e8}.cabin-yellow{background:#d8c900;color:#17120a}
+.scanline{position:absolute;width:360px;height:2px;background:var(--yellow);box-shadow:0 0 16px var(--yellow);animation:scan 3s ease-in-out infinite;opacity:.55}
+.telemetry{position:absolute;bottom:20px;left:10%;right:10%;display:flex;justify-content:space-between;font:10px "JetBrains Mono";color:#8f899f}
+.telemetry span:first-child{color:#48ff8b}
+.glass{background:var(--glass);border:1px solid var(--line);backdrop-filter:blur(16px);border-radius:var(--radius);box-shadow:var(--shadow)}
+.intro-grid,.spec-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.feature-card,.spec-card{padding:27px;transition:.3s}.feature-card:hover,.spec-card:hover,.team-card:hover{transform:translateY(-6px);border-color:rgba(255,234,0,.22)}
+.icon-box{width:45px;height:45px;border-radius:13px;display:grid;place-items:center;background:rgba(106,27,154,.25);color:#d28cff;font-size:22px;margin-bottom:22px}.icon-box.yellow{color:var(--yellow);background:rgba(255,234,0,.08)}.icon-box.pink{color:#ff4f9a;background:rgba(194,24,91,.12)}
+.feature-card h2{font-size:19px;margin:8px 0}.feature-card p,.mission p,.support-card p,.code-intro p,.video-copy p{font-size:13px;color:var(--muted)}
+.section-heading{display:flex;gap:24px;align-items:flex-start;margin-bottom:42px}.section-number{font:11px "JetBrains Mono";color:var(--pink);border:1px solid rgba(194,24,91,.5);padding:7px 9px;border-radius:7px}.section-heading h2{font-size:clamp(35px,5vw,56px);letter-spacing:-.04em;margin-top:7px}
+.mission-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}.mission{padding:30px;border-top:2px solid var(--violet)}.mission span{font:10px "JetBrains Mono";color:var(--yellow)}.mission p{font-size:20px;color:#eee;margin-top:12px;line-height:1.5}
+.values{display:grid;grid-template-columns:repeat(4,1fr);border:1px solid var(--line);margin:18px 0 70px;border-radius:18px;overflow:hidden}.value{padding:23px;border-right:1px solid var(--line);display:flex;flex-direction:column;gap:10px}.value:last-child{border:0}.value b{font:10px "JetBrains Mono";color:var(--pink)}.value span{font-weight:700;font-size:13px}
+.subheading{margin:40px 0 20px}.subheading span{font:10px "JetBrains Mono";color:var(--yellow)}.subheading h3{font-size:25px;margin-top:4px}
+.team-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:15px}.team-card{padding:22px;transition:.3s}.avatar{height:100px;border-radius:15px;background:linear-gradient(135deg,rgba(106,27,154,.45),rgba(194,24,91,.18));display:grid;place-items:center;font:30px "JetBrains Mono";color:rgba(255,255,255,.8);margin-bottom:17px}.team-card h3{font-size:15px}.team-card span{display:block;color:var(--muted);font-size:11px;margin:4px 0 13px}.team-card a{font-size:11px;color:var(--yellow)}
+.impact{margin-top:18px;padding:27px;display:grid;grid-template-columns:.8fr 1.5fr;gap:35px}.impact h3{font-size:24px;margin-top:8px}.impact-table>div{display:grid;grid-template-columns:1fr 1.5fr 1.3fr;padding:12px 0;border-bottom:1px solid var(--line);font-size:11px}.impact-table b{color:var(--yellow);font-family:"JetBrains Mono";font-size:9px}.impact-table strong{color:#bdebcf}
+.spec-card h3{margin:8px 0 5px}.spec-card p{font-size:12px;color:var(--muted);min-height:58px}.spec-icon{display:inline-grid;place-items:center;height:38px;padding:0 12px;border-radius:10px;background:rgba(106,27,154,.28);color:#d58cff;font:11px "JetBrains Mono"}.spec-icon.yellow{color:var(--yellow);background:rgba(255,234,0,.08)}.spec-icon.pink{color:#ff5c9f;background:rgba(194,24,91,.1)}.spec-card code{font:9px "JetBrains Mono";color:#aaa1b5}
+.simulator{margin-top:18px;padding:30px;overflow:hidden}.sim-head{display:flex;justify-content:space-between;align-items:center;gap:20px}.sim-head h3{font-size:25px;margin-top:5px}.status-pill{font:9px "JetBrains Mono";border:1px solid rgba(72,255,139,.3);color:#6cffaa;padding:8px 10px;border-radius:20px}.status-pill i{display:inline-block;width:6px;height:6px;border-radius:50%;background:#48ff8b;box-shadow:0 0 8px #48ff8b;margin-right:5px}.sim-body{display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:center;margin-top:30px}.sim-wheel-wrap{display:grid;place-items:center;min-height:400px}.sim-wheel{width:310px;height:310px;border-radius:50%;border:7px solid var(--violet);position:relative;transition:transform 2.2s cubic-bezier(.16,1,.3,1);box-shadow:0 0 45px rgba(106,27,154,.28)}.sim-wheel:before{content:"";position:absolute;inset:25px;border:1px dashed rgba(255,234,0,.3);border-radius:50%}.sim-center{position:absolute;z-index:3;left:calc(50% - 45px);top:calc(50% - 45px);width:90px;height:90px;border-radius:50%;background:var(--bg);border:3px solid var(--yellow);display:grid;place-items:center;text-align:center;font-weight:800;line-height:1.1;box-shadow:0 0 20px rgba(255,234,0,.25)}.sim-center small{font:9px "JetBrains Mono";color:var(--yellow)}
+.sim-cabin{position:absolute;left:calc(50% - 20px);top:calc(50% - 20px);width:40px;height:40px;border-radius:8px;display:grid;place-items:center;font:900 12px "JetBrains Mono";transform:rotate(calc(var(--a)*1deg)) translateY(-118px) rotate(calc(var(--a)*-1deg));border:1px solid rgba(255,255,255,.5)}.sr{background:#d72545}.sg{background:#18a968}.sb{background:#2667e8}.sy{background:#d8c900;color:#17120a}
+.sim-controls{padding-right:10px}.control-label{font-size:11px;color:var(--muted);margin-bottom:10px}.color-buttons{display:grid;grid-template-columns:1fr 1fr;gap:9px}.color-btn{border:1px solid rgba(255,255,255,.1);border-radius:11px;padding:11px;text-align:left;color:#fff;background:rgba(255,255,255,.04);cursor:pointer;font-weight:800;font-size:11px;transition:.2s}.color-btn small{display:block;color:rgba(255,255,255,.55);font:8px "JetBrains Mono";margin-top:3px}.color-btn:hover,.color-btn.active{transform:translateY(-2px);border-color:currentColor;box-shadow:0 0 18px currentColor}.color-btn.red{color:#ff536d}.color-btn.green{color:#4effa0}.color-btn.blue{color:#5d9aff}.color-btn.yellow{color:var(--yellow)}
+.readout{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:15px 0}.readout>div{background:rgba(0,0,0,.18);border:1px solid var(--line);border-radius:10px;padding:10px}.readout span{display:block;font:8px "JetBrains Mono";color:var(--muted)}.readout strong{display:block;font-size:12px;margin-top:4px}.sim-message{font-size:10px;color:var(--muted);text-align:center;margin-top:10px}
+.counter-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:13px}.counter-card{padding:18px}.counter-card>div:first-child{display:flex;justify-content:space-between;align-items:end}.counter-card span{font:9px "JetBrains Mono";color:var(--muted)}.counter-card strong{font-size:25px}.progress{height:4px;background:rgba(255,255,255,.08);margin-top:12px;border-radius:4px;overflow:hidden}.progress i{display:block;width:0;height:100%;background:var(--yellow);box-shadow:0 0 10px var(--yellow);transition:width .4s}.code-layout{display:grid;grid-template-columns:.7fr 1.3fr;gap:18px;margin-top:70px}.code-intro{padding:25px}.code-intro h3{font-size:30px;line-height:1.15;margin:9px 0}.class-list{display:grid;gap:8px;margin-top:25px}.class-list span{font:10px "JetBrains Mono";padding:9px;border-left:2px solid var(--violet);background:rgba(106,27,154,.1);color:#d6b7e8}
+.code-block{background:#090812;border:1px solid var(--line);border-radius:20px;padding:25px;overflow:auto;font:11px/1.75 "JetBrains Mono";color:#ddd;box-shadow:var(--shadow)}.kw{color:#e78cff}.cls{color:#68e0ff}.fn{color:#ffdb70}.num{color:#7dffb2}.str{color:#ff8eb4}.comment{color:#6e6878}
+.video-section{margin-top:18px;padding:25px;display:grid;grid-template-columns:.65fr 1.35fr;gap:25px;align-items:center}.video-copy h3{font-size:27px;margin:8px 0}.video-frame{aspect-ratio:16/9;border-radius:15px;overflow:hidden;background:#08070d;position:relative}.video-frame iframe{width:100%;height:100%;border:0}.video-fallback{position:absolute;inset:0;background:linear-gradient(135deg,#100b1e,#180d25);display:grid;place-content:center;text-align:center;gap:7px;pointer-events:none}.video-fallback span{font-size:35px;color:var(--yellow)}.video-fallback b{font-size:12px}.video-fallback small{color:var(--muted);font-size:9px}.contact-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:18px}.contact-form{padding:25px;display:grid;gap:15px}.form-row{display:grid;grid-template-columns:1fr 1fr;gap:13px}.contact-form label{font-size:10px;color:var(--muted);display:grid;gap:7px}.contact-form input,.contact-form textarea,.contact-form select{width:100%;background:rgba(0,0,0,.2);border:1px solid var(--line);border-radius:10px;padding:12px;color:white;outline:none;resize:vertical}.contact-form input:focus,.contact-form textarea:focus,.contact-form select:focus{border-color:var(--violet);box-shadow:0 0 15px rgba(106,27,154,.18)}.contact-form option{background:var(--bg)}.form-result{text-align:center;font-size:11px;color:#6cffaa;min-height:16px}
+.support{display:grid;gap:18px}.support-card{padding:25px}.support-card h3{font-size:22px;margin:6px 0}.map-card{height:220px;position:relative;overflow:hidden;background:#0b1220}.map-grid{position:absolute;inset:0;background-image:linear-gradient(35deg,transparent 45%,rgba(106,27,154,.5) 46%,transparent 48%),linear-gradient(120deg,transparent 44%,rgba(255,234,0,.25) 45%,transparent 47%),linear-gradient(rgba(255,255,255,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.04) 1px,transparent 1px);background-size:auto,auto,35px 35px,35px 35px}.map-pin{position:absolute;left:50%;top:45%;color:var(--yellow);font-size:35px;text-shadow:0 0 20px var(--yellow)}.map-label{position:absolute;bottom:14px;left:14px;background:rgba(15,12,27,.85);padding:9px 12px;border-radius:9px;display:grid}.map-label b{font-size:10px}.map-label span{font-size:8px;color:var(--muted)}
+.faq-wrap{margin-top:65px}.faq{display:grid;gap:10px}.faq details{padding:0 18px}.faq summary{list-style:none;cursor:pointer;padding:18px 3px;font-size:13px;font-weight:700;display:flex;justify-content:space-between}.faq summary::-webkit-details-marker{display:none}.faq summary span{color:var(--yellow);font-size:20px;transition:.2s}.faq details[open] summary span{transform:rotate(45deg)}.faq p{padding:0 3px 18px;color:var(--muted);font-size:11px;max-width:800px}
+footer{border-top:1px solid var(--line);padding:28px max(20px,calc((100% - var(--max))/2));display:flex;justify-content:space-between;align-items:center;gap:15px;color:var(--muted);font-size:9px}footer .brand{color:white}
+.reveal{opacity:0;transform:translateY(20px);transition:.7s ease}.reveal.visible{opacity:1;transform:none}
+@keyframes spin{to{transform:rotate(360deg)}}@keyframes scan{0%,100%{transform:translateY(-150px);opacity:.1}50%{transform:translateY(150px);opacity:.6}}
+@media(max-width:900px){nav{display:none;position:absolute;top:76px;left:15px;right:15px;padding:10px;background:rgba(15,12,27,.97);border:1px solid var(--line);border-radius:14px;flex-direction:column}nav.open{display:flex}.menu-toggle{display:block}.hero{grid-template-columns:1fr;padding-top:120px}.hero-visual{height:470px}.intro-grid,.spec-grid{grid-template-columns:1fr}.team-grid{grid-template-columns:1fr 1fr}.impact,.code-layout,.video-section,.contact-grid{grid-template-columns:1fr}.counter-grid{grid-template-columns:1fr 1fr}.mission-grid{grid-template-columns:1fr}}
+@media(max-width:600px){.section{width:min(var(--max),calc(100% - 28px));padding:90px 0 40px}.hero{min-height:auto}.hero h1{font-size:48px}.hero-stats{gap:18px;flex-wrap:wrap}.hero-visual{height:390px}.orbit-1{width:320px;height:320px}.orbit-2{width:365px;height:365px}.wheel-stage{transform:scale(.75)}.telemetry{font-size:7px}.values{grid-template-columns:1fr 1fr}.value:nth-child(2){border-right:0}.value:nth-child(-n+2){border-bottom:1px solid var(--line)}.team-grid,.counter-grid{grid-template-columns:1fr}.form-row{grid-template-columns:1fr}.sim-head{align-items:flex-start;flex-direction:column}.sim-body{grid-template-columns:1fr}.sim-wheel-wrap{min-height:320px}.sim-wheel{transform:scale(.85)}.code-block{font-size:9px;padding:15px}footer{flex-direction:column;align-items:flex-start}.section-heading{gap:12px}}
+
+.wrap{overflow-x:auto;margin-top:12px}.tbl{width:100%;border-collapse:collapse;font-size:12px;min-width:480px}.tbl th,.tbl td{border:1px solid var(--line);padding:10px;text-align:left}.tbl th{color:var(--yellow);font-size:11px;letter-spacing:.06em}.tbl td{color:var(--muted)}.tbl td:first-child{color:#fff;font-weight:700}
+.rgb-in{display:grid;grid-template-columns:repeat(3,1fr) auto;gap:8px;margin:14px 0}.rgb-in input{background:rgba(0,0,0,.2);border:1px solid var(--line);border-radius:10px;padding:10px;color:#fff;width:100%}
+.social{display:flex;gap:8px;flex-wrap:wrap}.map-card iframe{position:absolute;inset:0;width:100%;height:100%;border:0;filter:invert(.92) hue-rotate(180deg) saturate(.7)}
+.blk{padding:26px;margin-top:18px}.blk h3{margin-bottom:10px;font-size:20px}.blk p,.blk li{color:var(--muted);font-size:14px}.blk ul,.blk ol{padding-left:20px;display:grid;gap:6px}
+.cols{columns:2;column-gap:40px}.wrap{overflow-x:auto;margin-top:12px}
+.tbl{width:100%;border-collapse:collapse;font-size:12px;min-width:480px}.tbl th,.tbl td{border:1px solid var(--line);padding:9px 10px;text-align:left;height:36px}.tbl th{color:var(--yellow);font-size:11px;letter-spacing:.06em}.tbl td{color:var(--muted)}
+.ph{border:1px dashed rgba(255,255,255,.22);border-radius:14px;padding:34px 16px;text-align:center;color:var(--muted);font-size:12px}.ph3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:12px}
+.note{font-size:11px;color:var(--yellow);margin-top:12px}
+@media(max-width:700px){.cols{columns:1}.ph3{grid-template-columns:1fr}}
+.proj[hidden]{display:none}</style>
+</head>
+<body>
+  <div class="ambient ambient-a"></div>
+  <div class="ambient ambient-b"></div>
+
+  <header class="navbar" id="navbar">
+    <a class="brand" href="#inicio" aria-label="SpectroPark Dynamics inicio">
+      <span class="brand-mark"><span></span><span></span><span></span></span>
+      <span>SPECTRO<span>PARK</span> <small>DYNAMICS</small></span>
+    </a>
+    <button class="menu-toggle" id="menuToggle" aria-label="Abrir menú">☰</button>
+    <nav id="mainNav">
+      <a href="#solo-inicio" target="_blank" rel="noopener">01 Inicio</a>
+      <a href="#solo-filosofia" target="_blank" rel="noopener">02 Nosotros</a>
+      <a href="#solo-soluciones" target="_blank" rel="noopener">03 Tecnología</a>
+      <a href="#solo-contacto" target="_blank" rel="noopener">04 Contacto</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero section" id="inicio">
+      <div class="hero-copy reveal">
+        <div class="eyebrow"><span></span> GRUPO 8 · MECATRÓNICA · AUTOMATIZACIÓN</div>
+        <h1>Mecatrónica <em>en movimiento.</em></h1>
+        <p class="hero-subtitle">Dos ruedas, dos formas de aplicar la ingeniería.</p>
+        <p class="hero-text">
+          Dos proyectos del Grupo 8: una Rueda de Chicago movida por un motor eléctrico y BioWheel, una rueda inteligente con sensor RGB que analiza el color de las hojas.
+        </p>
+        <div class="hero-actions">
+          <a class="btn btn-primary" href="#solo-soluciones" target="_blank" rel="noopener">Ver prototipo en vivo <span>↗</span></a>
+          <a class="btn btn-ghost" href="#solo-biowheel" >BioWheel (hojas) ↗</a>
+          <a class="btn btn-ghost" href="#solo-documentacion" target="_blank" rel="noopener">Documentación técnica</a>
+        </div>
+        <div class="hero-stats"><div><strong>2</strong><span>Proyectos</span></div><div><strong>Motor</strong><span>Giro eléctrico</span></div><div><strong>RGB</strong><span>En BioWheel</span></div></div>
+      </div>
+
+      <div class="hero-visual reveal">
+        <div class="orbit orbit-1"></div>
+        <div class="orbit orbit-2"></div>
+        <div class="wheel-stage">
+          <div class="wheel" id="heroWheel">
+            <div class="wheel-hub"><span>SP</span></div>
+            <div class="cabin cabin-red" style="--i:0"><b>1</b></div>
+            <div class="cabin cabin-green" style="--i:1"><b>2</b></div>
+            <div class="cabin cabin-blue" style="--i:2"><b>3</b></div>
+            <div class="cabin cabin-yellow" style="--i:3"><b>4</b></div>
+            <div class="cabin cabin-red" style="--i:4"><b>5</b></div>
+            <div class="cabin cabin-green" style="--i:5"><b>6</b></div>
+            <div class="cabin cabin-blue" style="--i:6"><b>7</b></div>
+            <div class="cabin cabin-yellow" style="--i:7"><b>8</b></div>
+          </div>
+        </div>
+        <div class="scanline"></div>
+        <div class="telemetry">
+          <span>● MAQUETA</span>
+          <span id="heroTelemetry">MOTOR / LISTO</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="section intro-grid">
+      <article class="glass feature-card reveal"><div class="icon-box">◈</div><span class="card-kicker">MECATRÓNICA</span><h2>Mecánica + electricidad + software</h2><p>El Proyecto 1 es una Rueda de Chicago movida por un motor eléctrico, con una simulación en software de su giro.</p></article>
+      <article class="glass feature-card reveal"><div class="icon-box yellow">◎</div><span class="card-kicker">DOS PROYECTOS</span><h2>Rueda de Chicago y BioWheel</h2><p>La Rueda de Chicago es el proyecto mecánico. BioWheel suma un sensor RGB y Arduino para analizar el color de las hojas.</p></article>
+      <article class="glass feature-card reveal"><div class="icon-box pink">⌁</div><span class="card-kicker">INNOVACIÓN</span><h2>Una base ampliable</h2><p>Una estructura con motor puede crecer con sensores y control, como se hace en BioWheel.</p></article>
+    </section>
+
+    <section class="section" id="filosofia">
+      <div class="section-heading reveal">
+        <span class="section-number">02</span>
+        <div>
+          <span class="eyebrow">FILOSOFÍA INSTITUCIONAL</span>
+          <h2>Ingeniería con propósito.</h2>
+        </div>
+        <a class="btn btn-ghost open-win" href="#solo-filosofia" style="margin-left:auto;align-self:center">Abrir en ventana nueva ↗</a>
+      </div>
+
+      <div class="mission-grid">
+        <article class="mission glass reveal">
+          <span>MISIÓN</span>
+          <p>Desarrollar prototipos mecatrónicos accesibles, precisos y bien documentados que integren mecánica, electricidad y programación.</p>
+        </article>
+        <article class="mission glass reveal">
+          <span>VISIÓN</span>
+          <p>Ser referentes estudiantiles en prototipos mecánicos y tecnológicos con integración de software.</p>
+        </article>
+      </div>
+
+      <div class="values">
+        <div class="value reveal"><b>01</b><span>Innovación continua</span></div>
+        <div class="value reveal"><b>02</b><span>Precisión mecatrónica</span></div>
+        <div class="value reveal"><b>03</b><span>Trabajo colaborativo</span></div>
+        <div class="value reveal"><b>04</b><span>Rigor técnico</span></div>
+      </div>
+
+      <div class="subheading reveal"><span>EQUIPO · GRUPO 8</span><h3>Personas detrás de los proyectos</h3></div>
+      <div class="team-grid">
+        <article class="team-card glass reveal"><div class="avatar">RM</div><h3>Roxanna Molina</h3><span>Integrante · Grupo 8</span></article>
+        <article class="team-card glass reveal"><div class="avatar">FN</div><h3>Fernanda Nataren</h3><span>Integrante · Grupo 8</span></article>
+        <article class="team-card glass reveal"><div class="avatar">AW</div><h3>Adrian Wong</h3><span>Integrante · Grupo 8</span></article>
+        <article class="team-card glass reveal"><div class="avatar">RG</div><h3>Rodrigo García</h3><span>Integrante · Grupo 8</span></article>
+      </div>
+
+      <div class="impact glass reveal">
+        <div><span class="card-kicker">MATRIZ DE IMPACTO SOCIOCULTURAL</span><h3>De un prototipo académico a una idea aplicable.</h3></div>
+        <div class="impact-table">
+          <div><b>Área</b><b>Impacto</b><b>Resultado</b></div>
+          <div><span>Industria</span><span>Automatización de movimiento</span><strong>Mayor consistencia</strong></div>
+          <div><span>Educación</span><span>Aprendizaje STEM</span><strong>Integración práctica</strong></div>
+          <div><span>Sociedad</span><span>Acceso a tecnología</span><strong>Innovación estudiantil</strong></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section technology" id="soluciones">
+      <div class="section-heading reveal">
+        <span class="section-number">03</span>
+        <div>
+          <span class="eyebrow">SOLUCIONES TECNOLÓGICAS</span>
+          <h2>El laboratorio de control.</h2>
+        </div>
+        <a class="btn btn-ghost open-win" href="#solo-soluciones" style="margin-left:auto;align-self:center">Abrir en ventana nueva ↗</a>
+      </div>
+      <div class="proj-switch" style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:26px"><button class="btn btn-primary" data-p="1" type="button">Proyecto 1 · Rueda de Chicago</button><button class="btn btn-ghost" data-p="2" type="button">Proyecto 2 · BioWheel (hojas)</button></div>
+      <div class="proj" id="proj1">
+
+      <div class="spec-grid">
+        <article class="glass spec-card reveal"><span class="spec-icon">⚙</span><h3>Estructura</h3><p>Rueda de Chicago con cabinas que gira sobre su eje.</p><code>RUEDA · CABINAS</code></article>
+        <article class="glass spec-card reveal"><span class="spec-icon yellow">M</span><h3>Motor eléctrico</h3><p>Es el actuador que hace girar la rueda.</p><code>MOTOR → GIRO</code></article>
+        <article class="glass spec-card reveal"><span class="spec-icon pink">PY</span><h3>Programación</h3><p>Lógica en Python con objetos, como arquitectura educativa de referencia.</p><code>MotorElectrico → RuedaChicago</code></article>
+      </div>
+      <div class="glass reveal" style="padding:24px;margin-top:18px"><span class="card-kicker">TABLA DE COMPONENTES</span><div class="wrap"><table class="tbl"><tr><th>Componente</th><th>Tipo</th><th>Función</th></tr><tr><td>Rueda de Chicago</td><td>Estructura mecánica</td><td>Sostiene las cabinas y gira sobre su eje</td></tr><tr><td>Motor eléctrico</td><td>Actuador</td><td>Hace girar la rueda</td></tr></table></div><p class="note" style="color:var(--muted)">La Rueda de Chicago no usa sensores. El sensor RGB es parte de BioWheel.</p></div>
+      <div class="simulator glass reveal" style="margin-top:18px"><div class="sim-head"><div><span class="card-kicker">SIMULACIÓN DEL MOTOR</span><h3>Controla la rueda.</h3></div><div class="status-pill" id="simStatus"><i></i> MOTOR APAGADO</div></div>
+        <div class="sim-body"><div class="sim-wheel-wrap"><div class="sim-wheel" id="simWheel"><div class="sim-center">SP<br><small>MOTOR</small></div><span class="sim-cabin sr" style="--a:0">1</span><span class="sim-cabin sg" style="--a:45">2</span><span class="sim-cabin sb" style="--a:90">3</span><span class="sim-cabin sy" style="--a:135">4</span><span class="sim-cabin sr" style="--a:180">5</span><span class="sim-cabin sg" style="--a:225">6</span><span class="sim-cabin sb" style="--a:270">7</span><span class="sim-cabin sy" style="--a:315">8</span></div></div>
+        <div class="sim-controls"><p class="control-label">Velocidad (vueltas por minuto)</p><input type="range" id="rpm" min="1" max="12" value="4" style="width:100%">
+        <div class="readout"><div><span>ESTADO</span><strong id="motorState">Apagado</strong></div><div><span>VELOCIDAD</span><strong id="rpmReadout">4 RPM</strong></div><div><span>VUELTAS</span><strong id="turnsReadout">0</strong></div></div>
+        <button class="btn btn-primary full" id="motorToggle" type="button">▶ Encender motor</button><p class="sim-message" id="simMessage">Simulación en software. No son mediciones del prototipo.</p></div></div></div>
+
+      <div class="code-layout" id="documentacion"><div class="code-intro reveal"><span class="card-kicker">ARQUITECTURA POO</span><h3>La lógica detrás del movimiento.</h3><p>El motor gira y la rueda calcula su ángulo. Es una arquitectura educativa de referencia.</p><div class="class-list"><span>class MotorElectrico</span><span>class RuedaChicago</span></div></div>
+        <pre class="code-block reveal"><code><span class="kw">class</span> <span class="cls">MotorElectrico</span>:
+    <span class="kw">def</span> <span class="fn">__init__</span>(self):
+        self.encendido = <span class="kw">False</span>
+        self.rpm = <span class="num">0</span>
+
+    <span class="kw">def</span> <span class="fn">encender</span>(self, rpm):
+        self.encendido = <span class="kw">True</span>
+        self.rpm = rpm
+
+    <span class="kw">def</span> <span class="fn">apagar</span>(self):
+        self.encendido = <span class="kw">False</span>
+        self.rpm = <span class="num">0</span>
+
+
+<span class="kw">class</span> <span class="cls">RuedaChicago</span>:
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, motor, cabinas=<span class="num">8</span>):
+        self.motor = motor
+        self.cabinas = cabinas
+        self.angulo = <span class="num">0</span>
+
+    <span class="kw">def</span> <span class="fn">girar</span>(self, segundos):
+        grados = self.motor.rpm * <span class="num">360</span> / <span class="num">60</span> * segundos
+        self.angulo = (self.angulo + grados) % <span class="num">360</span>
+        <span class="kw">return</span> self.angulo
+
+
+motor = <span class="cls">MotorElectrico</span>()
+rueda = <span class="cls">RuedaChicago</span>(motor)
+motor.<span class="fn">encender</span>(rpm=<span class="num">4</span>)
+<span class="fn">print</span>(rueda.<span class="fn">girar</span>(segundos=<span class="num">2</span>))  <span class="comment"># 48.0</span></code></pre>
+      </div>
+
+      <div class="video-section glass reveal">
+        <div class="video-copy"><span class="card-kicker">DEMO FÍSICA</span><h3>La Rueda de Chicago en acción.</h3><p>La Rueda de Chicago girando con su motor eléctrico.</p></div>
+        <div class="video-frame">
+          <iframe id="demoVideo" title="Demostración del prototipo" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+          <div class="video-fallback"><span>▶</span><b>VIDEO DEL PROTOTIPO</b><small>Video del prototipo</small></div>
+        </div>
+      </div>
+    </div><div class="proj" id="proj2" hidden><div class="blk glass reveal" style="margin-top:0"><span class="card-kicker">COLEGIO LAS AMÉRICAS · FERIA CIENTÍFICA 2026</span><h3 style="font-size:26px;margin-top:8px">BioWheel</h3><p>Rueda inteligente para detectar y analizar el color de las hojas. Una maqueta de rueda de la fortuna con sensor RGB y Arduino que convierte el color reflejado por una hoja en datos. Integra Física, Química, Biología, Tecnología y Programación.</p></div><div class="subheading reveal" style="margin:44px 0 16px"><span>PROYECTO</span><h3>Planteamiento y objetivos</h3></div>
+<div class="spec-grid"><article class="glass spec-card reveal"><span class="spec-icon">LED</span><h3>La rueda</h3><p>Una maqueta de rueda de la fortuna iluminada: la parte mecánica y visual del proyecto.</p></article><article class="glass spec-card reveal"><span class="spec-icon yellow">RGB</span><h3>El sensor</h3><p>Un sensor de color y Arduino miden y controlan: registran el color que refleja la hoja.</p></article><article class="glass spec-card reveal"><span class="spec-icon pink">DATOS</span><h3>La respuesta</h3><p>El resultado se representa con luces o un indicador de la maqueta.</p></article></div>
+<div class="mission-grid" style="margin-top:18px"><article class="mission glass reveal"><span>PROBLEMA</span><p>El color de una hoja varía según su estado, edad, condiciones ambientales y proporción de pigmentos. La observación visual es subjetiva y depende de la iluminación y del observador.</p></article><article class="mission glass reveal"><span>PREGUNTA DE INVESTIGACIÓN</span><p>¿Cómo puede un sistema con sensor de color y Arduino detectar diferencias en el color de las hojas y representarlas mediante una maqueta interactiva?</p></article><article class="mission glass reveal"><span>HIPÓTESIS</span><p>Si se utiliza un sensor de color bajo condiciones de iluminación controladas, entonces será posible obtener valores RGB para distintas hojas, utilizando principios de Física, Química, Biología y Programación.</p></article><article class="mission glass reveal"><span>JUSTIFICACIÓN</span><p>Es una demostración educativa: aplica la tecnología a una pregunta biológica y transforma una característica visual en una medición reproducible bajo condiciones controladas.</p></article></div>
+<div class="blk glass reveal"><h3>Objetivo general</h3><p>Diseñar y construir una maqueta funcional que combine una rueda de la fortuna iluminada con un sistema de detección de colores de hojas, utilizando principios de Física, Química, Biología y Programación.</p></div>
+<div class="blk glass reveal"><h3>Objetivos específicos</h3><ul><li>Construir una rueda de la fortuna funcional con iluminación LED.</li><li>Integrar un sensor RGB y un microcontrolador Arduino.</li><li>Medir y registrar los componentes rojo, verde y azul de la luz reflejada por las hojas.</li><li>Comparar experimentalmente hojas de diferentes tonalidades.</li><li>Explicar la relación entre el color observado, los pigmentos vegetales y la luz.</li><li>Programar una respuesta visual mediante LEDs o una pantalla.</li><li>Presentar los resultados mediante tablas, gráficas y fotografías.</li></ul></div><div class="subheading reveal" style="margin:44px 0 16px"><span>MARCO TEÓRICO</span><h3>Cuatro disciplinas</h3></div>
+<div class="spec-grid"><article class="glass spec-card reveal"><span class="spec-icon">BIO</span><h3>Biología: color de las hojas</h3><p>Las hojas contienen pigmentos que absorben ciertas longitudes de onda y reflejan otras. La clorofila es el pigmento principal asociado al verde y participa en la fotosíntesis. Los carotenoides y las antocianinas pueden contribuir a colores amarillos, anaranjados, rojizos o morados.</p></article>
+<article class="glass spec-card reveal"><span class="spec-icon yellow">QUÍ</span><h3>Química: pigmentos y luz</h3><p>Los pigmentos son sustancias que interactúan con la radiación visible. Una superficie se ve de cierto color porque refleja parte de la luz y absorbe otra. El sensor no ve como una persona: mide la respuesta de la luz en distintos componentes de color.</p></article>
+<article class="glass spec-card reveal"><span class="spec-icon pink">FÍS</span><h3>Física: luz, color y electricidad</h3><p>Un sensor RGB separa la respuesta en rojo (R), verde (G) y azul (B). La electrónica convierte la señal en datos para el microcontrolador. El giro de la rueda se explica con rotación, fuerza, energía mecánica y transferencia de energía eléctrica.</p></article></div>
+<div class="blk glass reveal"><h3>Programación y sensores</h3><p>Los sensores de color para Arduino entregan información asociada a los componentes RGB. Se consideran los modelos TCS3200/TCS230 o TCS34725, según disponibilidad. El programa lee los valores, los compara con los rangos de la calibración y activa una respuesta visual.</p><p style="margin-top:10px">Para comparar de forma confiable se mantienen constantes la distancia entre sensor y hoja, la iluminación, el fondo y la posición de la muestra, y se calibra con superficies de referencia.</p></div><div class="subheading reveal" style="margin:44px 0 16px"><span>METODOLOGÍA</span><h3>Cómo se mide</h3></div>
+<div class="blk glass reveal" style="margin-top:0"><p>Se construye la rueda, se instalan los componentes electrónicos y se fija el sensor en una posición. El Arduino registra los valores RGB de hojas de diferentes tonalidades, con al menos tres lecturas por muestra y un promedio para disminuir pequeñas variaciones.</p>
+<div class="wrap"><table class="tbl"><tr><th>Tipo</th><th>Variable</th><th>Cómo se controla o mide</th></tr><tr><td>Independiente</td><td>Tipo y tonalidad de hoja</td><td>Seleccionar hojas con tonalidades diferentes.</td></tr><tr><td>Dependiente</td><td>Valores RGB</td><td>Lectura del sensor.</td></tr><tr><td>Controlada</td><td>Iluminación</td><td>Usar la misma fuente de luz.</td></tr><tr><td>Controlada</td><td>Distancia</td><td>Mantener la misma distancia sensor-hoja.</td></tr><tr><td>Controlada</td><td>Fondo</td><td>Usar un fondo uniforme.</td></tr></table></div></div>
+<div class="blk glass reveal"><h3>Materiales de construcción</h3><div class="cols"><ul><li>Arduino Uno o placa compatible</li><li>Sensor de color RGB (TCS3200/TCS230 o TCS34725)</li><li>LEDs o tira LED de bajo voltaje</li><li>Resistencias apropiadas para los LEDs</li><li>Protoboard y cables jumper</li><li>Fuente de alimentación o power bank adecuado</li><li>Motorreductor pequeño y controlador (si la rueda se automatiza)</li><li>Eje y soportes para la rueda</li><li>Computadora con Arduino IDE</li><li>Hojas reales para las pruebas</li><li>Regla, cinta, tijeras y materiales de decoración</li><li>Opcional: pantalla LCD/OLED</li></ul></div></div>
+<div class="blk glass reveal"><h3>Procedimiento</h3><ol><li>Construir la rueda y comprobar que gire de forma estable antes de instalar los LEDs.</li><li>Montar el sensor de color en una posición fija.</li><li>Conectar el sensor al Arduino según el esquema del modelo elegido.</li><li>Programar una lectura básica y comprobar que los datos cambien con distintos colores.</li><li>Calibrar con una referencia clara y una oscura, si el sensor lo requiere.</li><li>Seleccionar varias hojas y registrar al menos tres lecturas por muestra.</li><li>Calcular un promedio por muestra.</li><li>Programar una clasificación experimental por tonalidad, sin presentarla como diagnóstico de salud de la planta.</li><li>Conectar los LEDs de la rueda para que respondan a la categoría detectada.</li><li>Registrar fotografías, observaciones y resultados.</li></ol></div><div class="subheading reveal" style="margin:44px 0 16px"><span>RESULTADOS</span><h3>Observaciones y mediciones</h3></div>
+<div class="blk glass reveal" style="margin-top:0"><h3>Observaciones</h3><p>Se completa durante la construcción y las pruebas: cambios en las lecturas, comportamiento del sensor, estabilidad de la luz y funcionamiento de la rueda.</p><div class="wrap"><table class="tbl"><tr><th>Fecha / prueba</th><th>Observación</th><th>Acción o ajuste realizado</th></tr><tr><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td></tr></table></div></div>
+<div class="blk glass reveal"><h3>Resultados de las mediciones</h3><p>Solo se registran mediciones reales del equipo. No se inventan datos.</p><div class="wrap"><table class="tbl"><tr><th>Muestra</th><th>Hoja</th><th>R</th><th>G</th><th>B</th><th>Categoría</th><th>Observaciones</th></tr><tr><td>1</td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr><td>2</td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr><td>3</td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr><td>4</td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr><td>5</td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr><td>6</td><td></td><td></td><td></td><td></td><td></td><td></td></tr></table></div></div>
+<div class="mission-grid" style="margin-top:18px"><div class="ph">Gráficas de resultados: pendientes hasta tener mediciones.</div><div class="ph">Discusión y conclusiones: pendientes hasta tener mediciones.</div></div>
+<div class="subheading reveal" style="margin:44px 0 16px"><span>ANEXOS</span><h3>Evidencias y bibliografía</h3></div>
+<div class="blk glass reveal" style="margin-top:0"><h3>Anexo A. Bitácora de desarrollo</h3><div class="wrap"><table class="tbl"><tr><th>Etapa</th><th>Registro</th></tr><tr><td>Día 1 – Investigación</td><td>Investigamos el color de las hojas, pigmentos, sensores RGB y funcionamiento de Arduino.</td></tr><tr><td>Día 2 – Diseño</td><td>Diseñamos la rueda, la zona de medición y la distribución de los componentes.</td></tr><tr><td>Día 3 – Construcción</td><td>Construimos la base y la rueda y comprobamos el movimiento.</td></tr><tr><td>Día 4 – Electrónica</td><td>Realizamos las conexiones del sensor, LEDs y Arduino.</td></tr><tr><td>Día 5 – Programación</td><td>Probamos la lectura RGB y la respuesta de las luces.</td></tr><tr><td>Día 6 – Experimentación</td><td>Medimos las hojas, registramos datos y repetimos lecturas.</td></tr><tr><td>Día 7 – Análisis</td><td>Organizamos tablas, gráficas, conclusiones y evidencias.</td></tr><tr><td>Día 8 – Presentación</td><td>Preparamos el póster y practicamos la demostración.</td></tr></table></div></div>
+<div class="blk glass reveal"><h3>Anexo B. Evidencias fotográficas</h3><div class="ph3"><div class="ph">Foto 1</div><div class="ph">Foto 2</div><div class="ph">Foto 3</div></div></div>
+<div class="code-layout"><div class="code-intro reveal"><span class="card-kicker">ANEXO C</span><h3>Programación y pseudocódigo.</h3><p>Esquema general de la lógica del Arduino. Es una referencia: debe ajustarse al código real del equipo.</p></div><pre class="code-block reveal"><code>// Pseudocódigo de referencia (el equipo debe ajustarlo a su código real)
+INICIO
+  configurar pines del sensor RGB y de los LEDs
+  calibrar con referencia clara y oscura
+REPETIR
+  leer R, G, B del sensor (3 lecturas) y calcular el promedio
+  comparar con los rangos de la calibración
+  SI predomina verde  -> categoría "Verde"
+  SI predomina amarillo -> categoría "Amarillo"
+  SI predomina rojizo -> categoría "Rojizo"
+  encender los LEDs de la rueda según la categoría
+  mostrar R, G, B y categoría (pantalla o monitor serie)
+FIN</code></pre></div>
+<div class="blk glass reveal"><h3>Anexo D. Normas de seguridad</h3><ul><li>Usar LEDs o tira LED de bajo voltaje con resistencias apropiadas.</li><li>Usar una fuente de alimentación o power bank adecuado al circuito.</li><li>Comprobar que la rueda gire de forma estable antes de instalar los LEDs.</li><li>Completar con las normas definidas por el equipo y los docentes.</li></ul></div>
+<div class="video-section glass reveal">
+        <div class="video-copy"><span class="card-kicker">DEMO FÍSICA</span><h3>BioWheel en acción.</h3><p>Video del prototipo BioWheel funcionando.</p></div>
+        <div class="video-frame">
+          <iframe id="demoVideo2" title="Demostración de BioWheel" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+          <div class="video-fallback"><span>▶</span><b>VIDEO DEL PROTOTIPO</b><small>Video del prototipo</small></div>
+        </div>
+      </div>
+
+<div class="blk glass reveal"><h3>Bibliografía</h3><p>Pendiente: el equipo debe agregar las fuentes consultadas.</p></div></div>
+    </section>
+
+    <section class="section contact-section" id="contacto">
+      <div class="section-heading reveal">
+        <span class="section-number">04</span>
+        <div><span class="eyebrow">CENTRO DE CONTACTO & SOPORTE</span><h2>Conectemos con la ingeniería.</h2></div>
+        <a class="btn btn-ghost open-win" href="#solo-contacto" style="margin-left:auto;align-self:center">Abrir en ventana nueva ↗</a>
+      </div>
+
+      <div class="contact-grid">
+        <form class="glass contact-form reveal" id="contactForm">
+          <div class="form-row"><label>Nombre<input id="name" type="text" placeholder="Tu nombre" required></label><label>Correo<input id="email" type="email" placeholder="correo@ejemplo.com" required></label></div>
+          <label>Tipo de consulta
+            <select id="topic" required><option value="">Seleccionar...</option><option>Evaluación de Jurado</option><option>Consulta Técnica</option><option>Asesoría</option></select>
+          </label>
+          <label>Mensaje<textarea id="message" rows="5" placeholder="Escribe tu consulta..." required></textarea></label>
+          <button class="btn btn-primary full" type="submit">Enviar consulta ↗</button>
+          <p class="form-result" id="formResult"></p>
+        </form>
+
+        <div class="support reveal">
+          <article class="support-card glass"><span class="icon-box pink">⌁</span><span class="card-kicker">ASESORÍA</span><h3>Automatización aplicada</h3><p>Diseño conceptual, integración de sensores, lógica de control y documentación de prototipos mecatrónicos.</p></article>
+          <div class="map-card glass"><iframe title="Mapa de Guatemala" loading="lazy" src="https://www.openstreetmap.org/export/embed.html?bbox=-90.65%2C14.50%2C-90.45%2C14.70&layer=mapnik"></iframe><div class="map-label"><b>Ubicación aproximada</b><span>Guatemala · Grupo 8</span></div></div>
+          <div class="social"><a class="btn btn-ghost" href="#contacto" title="Reemplaza con el enlace real">Instagram</a><a class="btn btn-ghost" href="#contacto" title="Reemplaza con el enlace real">Facebook</a><a class="btn btn-ghost" href="#contacto" title="Reemplaza con el enlace real">YouTube</a><a class="btn btn-ghost" href="#contacto" title="Reemplaza con el enlace real">GitHub</a></div>
+        </div>
+      </div>
+
+      <div class="faq-wrap">
+        <div class="subheading reveal"><span>FAQ</span><h3>Preguntas frecuentes</h3></div>
+        <div class="faq">
+          <details class="glass reveal"><summary>¿Qué mueve la Rueda de Chicago?<span>+</span></summary><p>Un motor eléctrico hace girar la rueda.</p></details>
+          <details class="glass reveal"><summary>¿Dónde está el sensor RGB?<span>+</span></summary><p>En BioWheel, el proyecto que mide el color de las hojas con un sensor RGB y Arduino. La Rueda de Chicago no usa sensores de color.</p></details>
+          <details class="glass reveal"><summary>¿Por qué utilizar programación orientada a objetos?<span>+</span></summary><p>Permite dividir el sistema en componentes independientes, como el motor y la rueda. Esto facilita probar, mantener y ampliar el proyecto.</p></details>
+          <details class="glass reveal"><summary>¿Dónde se puede aplicar este concepto?<span>+</span></summary><p>La base de estructura más motor se puede adaptar a atracciones, demostraciones educativas y otros sistemas mecánicos automatizados.</p></details>
+          <details class="glass reveal"><summary>¿Qué diferencia hay entre los dos proyectos?<span>+</span></summary><p>La Rueda de Chicago es una rueda mecánica movida por un motor eléctrico. BioWheel usa un sensor RGB y Arduino para medir el color de hojas reales y responder con luces; es el proyecto de la Feria Científica del Colegio Las Américas.</p></details>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="brand"><span class="brand-mark"><span></span><span></span><span></span></span><span>SPECTRO<span>PARK</span> <small>DYNAMICS</small></span></div>
+    <p>GRUPO 8 · Rueda de Chicago + BioWheel</p>
+    <span>© <span id="year"></span> SpectroPark Dynamics</span>
+  </footer>
+
+  <script>
+const $ = (s) => document.querySelector(s);
+const $$ = (s) => document.querySelectorAll(s);
+
+$("#year").textContent = new Date().getFullYear();
+
+const menuToggle = $("#menuToggle");
+const mainNav = $("#mainNav");
+menuToggle?.addEventListener("click", () => mainNav.classList.toggle("open"));
+$$("nav a").forEach(a => a.addEventListener("click", () => mainNav.classList.remove("open")));
+
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add("visible");
+      observer.unobserve(entry.target);
+    }
+  });
+}, {threshold:.12});
+$$(".reveal").forEach(el => observer.observe(el));
+
+let ang=0,on=false,last=0,raf=0;
+const rpmEl=$("#rpm"),wheel=$("#simWheel");
+wheel.style.transition="none";
+rpmEl.addEventListener("input",()=>{$("#rpmReadout").textContent=rpmEl.value+" RPM";});
+function tick(t){
+  if(!on)return;
+  const dt=(t-last)/1000;last=t;
+  ang+=rpmEl.value*360/60*dt;
+  wheel.style.transform="rotate("+ang+"deg)";
+  $("#turnsReadout").textContent=Math.floor(ang/360);
+  raf=requestAnimationFrame(tick);
+}
+$("#motorToggle").addEventListener("click",()=>{
+  on=!on;
+  $("#motorState").textContent=on?"Encendido":"Apagado";
+  $("#simStatus").innerHTML="<i></i> "+(on?"MOTOR ENCENDIDO":"MOTOR APAGADO");
+  $("#motorToggle").textContent=on?"■ Apagar motor":"▶ Encender motor";
+  $("#heroTelemetry").textContent=on?"MOTOR / ENCENDIDO":"MOTOR / LISTO";
+  if(on){last=performance.now();raf=requestAnimationFrame(tick);}else cancelAnimationFrame(raf);
+});
+
+$("#contactForm").addEventListener("submit", (e) => {
+  e.preventDefault();
+  const name = $("#name").value.trim();
+  $("#formResult").textContent = `Gracias, ${name}. La consulta quedó preparada para envío.`;
+  e.target.reset();
+});
+
+$$(".faq details").forEach(item => {
+  item.addEventListener("toggle", () => {
+    if (item.open) {
+      $$(".faq details").forEach(other => {
+        if (other !== item) other.removeAttribute("open");
+      });
+    }
+  });
+});
+
+
+
+/* Cada sección se abre en su propia ventana de navegador (popup) */
+(function(){
+  const ORIGINAL = "<!DOCTYPE html>" + document.documentElement.outerHTML;
+  const ids = {inicio:"inicio", filosofia:"filosofia", soluciones:"soluciones", documentacion:"soluciones", biowheel:"soluciones", contacto:"contacto"};
+
+  function applySolo(v){
+    const target = ids[v];
+    if(!target) return;
+    document.querySelectorAll("main > section").forEach(s => {
+      const keep = s.id === target || (v === "inicio" && s.classList.contains("intro-grid"));
+      if(!keep) s.style.display = "none";
+    });
+    if(v === "documentacion"){
+      document.querySelectorAll(".proj-switch,#proj2").forEach(c => c.style.display = "none");
+      document.querySelectorAll("#proj1 > *").forEach(c => {
+        if(!c.classList.contains("section-heading") && c.id !== "documentacion") c.style.display = "none";
+      });
+    }
+    document.querySelectorAll(".open-win").forEach(b => b.style.display = "none");
+    document.querySelectorAll(".reveal").forEach(el => el.classList.add("visible"));
+    window.scrollTo(0,0);
+  }
+
+  const fromHash = (location.hash.match(/^#solo-([a-z]+)$/) || [])[1];
+  const v = window.__SOLO || fromHash;
+  if(v) applySolo(v);
+  if(v === "biowheel") showProj(2);
+
+  function openSection(key){
+    const W = Math.min(1200, screen.availWidth - 80), H = Math.min(820, screen.availHeight - 80);
+    const L = Math.round((screen.availWidth - W)/2), T = Math.round((screen.availHeight - H)/2);
+    const feat = "popup=yes,width="+W+",height="+H+",left="+L+",top="+T+",resizable=yes,scrollbars=yes";
+    const name = "spectropark_" + key;
+    let w;
+    if(location.protocol === "http:" || location.protocol === "https:"){
+      w = window.open(location.pathname + "#solo-" + key, name, feat);
+      if(w){ w.location.reload(); }
+    } else {
+      w = window.open("", name, feat);
+      if(w){
+        const doc = ORIGINAL.replace("<head>", "<head><script>window.__SOLO='" + key + "';<\/script>");
+        w.document.open(); w.document.write(doc); w.document.close();
+      }
+    }
+    if(w){ w.focus(); return; }
+    alert("El navegador bloqueó la ventana emergente. Permite las ventanas emergentes para esta página e inténtalo de nuevo.");
+  }
+
+  document.querySelectorAll('a[href^="#solo-"]').forEach(a => {
+    a.addEventListener("click", e => {
+      e.preventDefault();
+      openSection(a.getAttribute("href").replace("#solo-", ""));
+    });
+  });
+})();
+
+/* ===== VIDEOS DE YOUTUBE (pega aquí los enlaces) ===== */
+const VIDEOS = {
+  demoVideo:  "https://youtu.be/Xy0YSwv80To",   // Proyecto 1 · Rueda de Chicago
+  demoVideo2: "https://youtu.be/8smNcRl_YZk"    // Proyecto 2 · BioWheel
+};
+Object.entries(VIDEOS).forEach(([fid,url])=>{
+  const m = url.match(/(?:youtu\.be\/|v=|embed\/|shorts\/)([A-Za-z0-9_-]{11})/);
+  const frame = document.getElementById(fid);
+  if(!m || !frame) return;
+  frame.src = "https://www.youtube.com/embed/" + m[1];
+  const box = frame.parentElement;
+  const fb = box.querySelector(".video-fallback"); if(fb) fb.style.display = "none";
+  const a = document.createElement("a");
+  a.href = "https://www.youtube.com/watch?v=" + m[1]; a.target = "_blank"; a.rel = "noopener";
+  a.textContent = "Ver en YouTube ↗"; a.className = "btn btn-ghost"; a.style.marginTop = "12px";
+  box.after(a);
+});
+</script>
+</body>
+</html>
